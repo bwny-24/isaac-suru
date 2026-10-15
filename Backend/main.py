@@ -112,7 +112,7 @@ async def read_all(db: db_dependency):
     return db.query(Todos).all()
 
 # --- READ BY ID ---
-@app.get("/todos/{todo_id}")
+@app.get("/todos/{todo_id}", responses={404: {"description": "Todo not found"}})
 async def get_todo_id(db: db_dependency, todo_id: int = Path(gt=0)):
     todo_result = db.query(Todos).filter(Todos.id == todo_id).first()
     
@@ -135,7 +135,7 @@ async def create_todo(db: db_dependency, todo_request: TodoRequest):
     return {"message": "To-do item successfully created", "data": new_todo}
 
 # --- UPDATE ---
-@app.put("todos/{todo_id}")
+@app.put("/todos/{todo_id}", responses={404: {"description": "Todo not found"}})  # Added leading slash
 async def update_todo(db: db_dependency, todo_request: TodoRequest, 
                       todo_id: int = Path(gt=0)):
     todo_result = db.query(Todos).filter(Todos.id == todo_id).first()
@@ -151,7 +151,7 @@ async def update_todo(db: db_dependency, todo_request: TodoRequest,
     return{"message": "get this shit done"}
 
 # --- DELETE ---
-@app.delete("todos/{todo_id}")
+@app.delete("/todos/{todo_id}", responses={404: {"description": "Todo not found"}})  # Added leading slash
 async def delete_todo(db: db_dependency, todo_id: int = Path(gt=0)):
     todo_result = db.query(Todos).filter(Todos.id == todo_id).first()
     if todo_result is None:
