@@ -13,7 +13,11 @@ TODO_NOT_FOUND = "Todo not found"
 # --- Enable CORS for React Frontend ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Adjust port if needed (e.g., http://localhost:5173 for Vite)
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "*"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -34,6 +38,7 @@ class TodoRequest(BaseModel):
     title: str = Field(min_length=3, max_length=100)
     description: Optional[str] = Field(default="", max_length=10000)
     completed: bool = Field(default=False)
+    priority: Optional[str] = Field(default="low")  # <-- MUST BE INCLUDED HERE
 
 # --- READ ALL ---
 @app.get("/todos")
@@ -55,6 +60,7 @@ async def create_todo(db: db_dependency, todo_request: TodoRequest):
         title=todo_request.title,
         description=todo_request.description,
         completed=todo_request.completed,
+        priority=todo_request.priority,  # <-- ASSIGN PRIORITY HERE
     )
     db.add(new_todo)
     db.commit()
@@ -71,10 +77,12 @@ async def update_todo(db: db_dependency, todo_request: TodoRequest, todo_id: int
     todo_result.title = todo_request.title
     todo_result.description = todo_request.description
     todo_result.completed = todo_request.completed
+    todo_result.priority = todo_request.priority  # <-- ASSIGN PRIORITY HERE
     
     db.add(todo_result)
     db.commit()
     return {"message": "Todo updated successfully"}
+
 
 # --- DELETE ---
 @app.delete("/todos/{todo_id}", responses={404: {"description": TODO_NOT_FOUND}})
@@ -86,3 +94,6 @@ async def delete_todo(db: db_dependency, todo_id: int = Path(gt=0)):
     db.delete(todo_result)
     db.commit()
     return {"message": "Deleted successfully"}
+
+
+# Update PUT route similarly to set todo_result.priority = todo_request.priority
