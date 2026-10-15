@@ -8,20 +8,42 @@ import axios from 'axios'
 function App() {
 //  const [count, setCount] = useState(0)
 
-const [books, setBooks]  = useState([])
+const [todos, setTodos]  = useState([])
 const [formData, setFormData] = useState({
   title:'',
-  author:'',
-  published_year:''
+  description:'',
+  completed: False
 })
 
-constant [editingId, setEditing] = useState (null)
-constant API_URL = 'http://localhost:8000'
+const [editingId, setEditing] = useState (null)
+const API_URL = 'http://localhost:8000'
 
 useEffect(() => {
-  fetchAllBooks()
+  fetchAllTodos()
 }, )
 
+// Get Request
+
+const fetchAllTodos = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/todos`)
+    setBooks(response.data)
+  } catch (error){
+    console.error('Error fetching todos:', error)
+  }
+}
+
+const createTodo = async (e) => {
+  e.preventDefault()
+  try{
+    await axios.post(`${API_URL}/todos`, {
+      title: formData.title,
+      description: formData.description,
+      completed: 
+      
+    })
+  }
+}
 
 
 }
